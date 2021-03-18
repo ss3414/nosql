@@ -1,0 +1,9 @@
+# 文件夹
+/.idea/
+/**/target/
+/**/.gradle/
+/**/build/
+
+# 文件
+*.iml
+/springboot_es/doc/data.sql

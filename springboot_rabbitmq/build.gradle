@@ -1,0 +1,30 @@
+plugins {
+    id "java"
+    id "org.springframework.boot" version "2.3.2.RELEASE"
+    id "io.spring.dependency-management" version "1.0.8.RELEASE" /* SpringBoot项目打包需要org.springframework.boot+io.spring.dependency-management */
+}
+
+group = "com"
+version = "1.0"
+sourceCompatibility = "1.8"
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+repositories {
+    maven {
+        url "http://maven.aliyun.com/nexus/content/groups/public/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web:2.3.2.RELEASE"
+    implementation "org.springframework.boot:spring-boot-starter-amqp:2.3.2.RELEASE"
+    developmentOnly "org.springframework.boot:spring-boot-devtools:2.3.2.RELEASE"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:2.3.2.RELEASE"
+}
