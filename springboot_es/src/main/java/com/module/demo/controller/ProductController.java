@@ -14,11 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +35,7 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
-    @GetMapping("/list")
+    @RequestMapping("/list")
     public ModelAndView list(
             @RequestParam(defaultValue = "name") String field,
             @RequestParam(defaultValue = "") String keyword,
@@ -48,7 +51,7 @@ public class ProductController {
 
         int pageSize = 10;
         int start = currentPage - 1; /* 开始页 */
-        Sort sort = new Sort(Sort.Direction.ASC, "id");
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
         Pageable pageable = PageRequest.of(start, pageSize, sort);
 
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
@@ -68,7 +71,7 @@ public class ProductController {
     }
 
     /* 新增/修改页 */
-    @GetMapping("/page")
+    @RequestMapping("/page")
     public ModelAndView page(@RequestParam(defaultValue = "0") Integer id) {
         Product product = productRepository.findById(id).get();
 
@@ -85,34 +88,34 @@ public class ProductController {
         return new ModelAndView("redirect:/product/list");
     }
 
-    @GetMapping("/delete")
+    @RequestMapping("/delete")
     public ModelAndView delete(Product product) {
         productRepository.delete(product);
         return new ModelAndView("redirect:/product/list");
     }
 
     /* 全部删除 */
-    @GetMapping("/deleteAll")
+    @RequestMapping("/deleteAll")
     public Map deleteAll() {
         long count = productRepository.count();
         long begin = System.currentTimeMillis();
         productRepository.deleteAll();
         long times = System.currentTimeMillis() - begin;
 
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         map.put("result", "删除:" + count + "条记录 耗时:" + times / 1000.0 + "秒");
         return map;
     }
 
     /* 批量插入 */
-    @GetMapping("/batchInsert")
+    @RequestMapping("/batchInsert")
     public Map batchInsert() {
         List<Product> productList = productMapper.selectList(new QueryWrapper<>());
         long begin = System.currentTimeMillis();
         productRepository.saveAll(productList);
         long times = System.currentTimeMillis() - begin;
 
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         map.put("result", "插入:" + productList.size() + "条记录 耗时:" + times / 1000.0 + "秒");
         return map;
     }

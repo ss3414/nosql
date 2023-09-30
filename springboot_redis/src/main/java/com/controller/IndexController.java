@@ -1,22 +1,19 @@
 package com.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("")
 public class IndexController {
 
-    @GetMapping("/")
+    @RequestMapping("/")
     public Map index() {
-        Map map = new HashMap();
-        map.put("status", 1000);
-        return map;
+        return new LinkedHashMap();
     }
 
     @RequestMapping("/session")
@@ -26,7 +23,7 @@ public class IndexController {
         } else {
             System.out.println(session.getAttribute("sessionKey"));
         }
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         map.put("result", "session");
         return map;
     }
