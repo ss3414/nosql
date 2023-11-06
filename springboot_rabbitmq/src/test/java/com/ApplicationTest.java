@@ -12,8 +12,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 public class ApplicationTest {
 
-    /* IDEA Gradle设置中，Delegate settings选择IDEA（使用IDEA而非Gradle Task运行main/test） */
-
     @Autowired
     private AmqpAdmin amqpAdmin;
 

@@ -17,14 +17,16 @@ demo：CURD+分页+查询<br>
 文档型数据库MongoDB<br>
 （MongoDB可以看作动态表结构的关系型数据库）<br>
 
+# springboot_kafka
+Kafka<br>
+
 # springboot_rabbitmq
-①Gradle<br>
-②接收消息
-MQListener1：@RabbitListener
-MQListener2：MQConfig+MessageListener接口
+MQListener1：@RabbitListener<br>
+MQListener2：MQConfig+MessageListener接口<br>
 
 # springboot_redis
 ①键值对型非关系型数据库Redis<br>
 手动插入键值对/对象<br>
-②spring-session-data-redis<br>
-@EnableCaching+@Cacheable<br>
+②缓存<br>
+实体类需要实现Serializable接口<br>
+③Redis执行Lua脚本<br>

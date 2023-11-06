@@ -4,6 +4,7 @@
 
     <modules>
         <module>springboot_es</module>
+        <module>springboot_kafka</module>
         <module>springboot_mongodb</module>
         <module>springboot_rabbitmq</module>
         <module>springboot_redis</module>
