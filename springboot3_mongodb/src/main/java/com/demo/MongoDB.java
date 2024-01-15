@@ -7,7 +7,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -70,8 +69,8 @@ public class MongoDB {
 
         Query query2 = new Query(Criteria.where("id").is("5ea793545eaf338c9c4e90db"));
         Update update = new Update()
-            .set("name", "name123")
-            .set("test", "test123");
+                .set("name", "name123")
+                .set("test", "test123");
         mongoTemplate.updateFirst(query2, update, User.class);
         return new LinkedHashMap();
     }
@@ -82,9 +81,9 @@ public class MongoDB {
         List<User> userList = userRepository.findAll();
         for (User user : userList) {
             mongoTemplate.updateFirst(
-                new Query(Criteria.where("id").is(user.getId())),
-                new Update().set("test", "test123"),
-                User.class);
+                    new Query(Criteria.where("id").is(user.getId())),
+                    new Update().set("test", "test123"),
+                    User.class);
         }
         return new LinkedHashMap();
     }
@@ -105,16 +104,13 @@ public class MongoDB {
 //        BasicDBObject query = new BasicDBObject("name", new BasicDBObject("$ne", "null")); /* 不为空 */
 //        BasicDBObject query = new BasicDBObject("name", new BasicDBObject("$exists", true)); /* 字段存在 */
         BasicDBObject[] conditions = {
-            new BasicDBObject("name", "name123"),
-            new BasicDBObject("password", new BasicDBObject("$exists", false))
+                new BasicDBObject("name", "name123"),
+                new BasicDBObject("password", new BasicDBObject("$exists", false))
         };
         BasicDBObject query = new BasicDBObject();
         query.put("$and", conditions); /* 多条件 */
         FindIterable<Document> iterator = mongoCollection.find(query);
-        MongoCursor<Document> cursor = iterator.iterator();
-        while (cursor.hasNext()) {
-            Document document = cursor.next();
-
+        for (Document document : iterator) {
             /* 更新 */
             ObjectId id = document.getObjectId("_id");
             BasicDBObject update = new BasicDBObject("_id", id);

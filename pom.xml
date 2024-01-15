@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modules>
-        <module>springboot_kafka</module>
         <module>springboot3_es</module>
+        <module>springboot3_kafka</module>
         <module>springboot3_mongodb</module>
         <module>springboot3_redis</module>
     </modules>

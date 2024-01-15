@@ -1,6 +1,6 @@
-package com.demo.dao;
+package com.demo;
 
-import com.demo.model.User;
+import jakarta.annotation.Nonnull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -12,15 +12,17 @@ import java.util.Optional;
 public interface UserDao extends JpaRepository<User, Integer> {
 
     @Cacheable(key = "0")
+    @Nonnull
     @Override
-    Optional<User> findById(Integer id);
+    Optional<User> findById(@Nonnull Integer id);
 
     @CacheEvict(key = "0", beforeInvocation = true)
+    @Nonnull
     @Override
-    <S extends User> S save(S s);
+    <S extends User> S save(@Nonnull S s);
 
     @CacheEvict(key = "0", allEntries = true)
     @Override
-    void deleteById(Integer id);
+    void deleteById(@Nonnull Integer id);
 
 }

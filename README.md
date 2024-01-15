@@ -13,15 +13,14 @@ TCP：9300（7.0废弃）
 启动项目前同步ES<br>
 CURD+分页+查询<br>
 
-# springboot3_mongodb
-文档型数据库MongoDB<br>
-（MongoDB可以看作动态表结构的关系型数据库）<br>
-
 # springboot3_kafka
 Kafka<br>
 
+# springboot3_mongodb
+MongoDB<br>
+
 # springboot3_redis
-①键值对型非关系型数据库Redis<br>
+①Redis<br>
 手动插入键值对/对象<br>
 ②缓存<br>
 实体类需要实现Serializable接口<br>
