@@ -4,10 +4,9 @@ import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.ListTopicsOptions;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,6 +15,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -56,14 +57,29 @@ public class Kafka {
     }
 
     @SneakyThrows
-    @RequestMapping("/topics")
-    public Map topics() {
+    @RequestMapping("/client")
+    public Map client() {
         Properties properties = new Properties();
-        properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-        AdminClient adminClient = AdminClient.create(properties);
-        ListTopicsOptions listTopicsOptions = new ListTopicsOptions();
-        listTopicsOptions.listInternal(true);
-        log.info(adminClient.listTopics(listTopicsOptions).names().get().toString());
+        properties.put("bootstrap.servers", "127.0.0.1:9092");
+        properties.setProperty("group.id", "group-1");
+        properties.setProperty("enable.auto.commit", "true");
+        properties.setProperty("auto.commit.interval.ms", "1000");
+        properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+        /* 列出topics */
+//        AdminClient adminClient = AdminClient.create(properties);
+//        ListTopicsOptions listTopicsOptions = new ListTopicsOptions();
+//        listTopicsOptions.listInternal(true);
+//        log.info(adminClient.listTopics(listTopicsOptions).names().get().toString());
+
+        /* consumer */
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+        consumer.subscribe(Collections.singletonList(myTopic));
+        ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+        for (ConsumerRecord<String, String> record : records) {
+            log.info("offset = {}, key = {}, value = {}%n", record.offset(), record.key(), record.value());
+        }
         return new LinkedHashMap();
     }
 
