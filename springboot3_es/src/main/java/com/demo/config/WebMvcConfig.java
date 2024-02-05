@@ -17,7 +17,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         /* 替换StringHttpMessageConverter，强制String型UTF-8编码 */
         StringHttpMessageConverter stringConverter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
-        converters.removeIf(e -> e instanceof StringHttpMessageConverter);
+        converters.removeIf(StringHttpMessageConverter.class::isInstance);
         converters.add(stringConverter);
     }
 

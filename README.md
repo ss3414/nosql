@@ -3,7 +3,7 @@
 
 ************************************************************************************************************************
 
-# springboot3_es（待处理）
+# springboot3_es（待修复）
 ①MBP+spring-data-elasticsearch<br>
 ②功能<br>
 启动项目前同步ES<br>
@@ -21,3 +21,5 @@ MongoDB<br>
 ②缓存<br>
 实体类需要实现Serializable接口<br>
 ③Redis执行Lua脚本<br>
+分布式锁<br>
+分布式限流<br>

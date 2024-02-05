@@ -1,21 +1,31 @@
-package com.demo;
+package com.demo.controller;
 
-import jakarta.annotation.PostConstruct;
+import com.demo.dao.UserDao;
+import com.demo.model.User;
+import com.demo.ratelimit.RateLimit;
+import com.demo.redis.LuaScriptSupport;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -51,15 +61,8 @@ public class IndexController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    private DefaultRedisScript<Long> redisScript;
-
-    /* 被@PostConstruct修饰的方法在整个Servlet生命周期只执行一次，即使多次实例化 */
-    @PostConstruct
-    public void init() {
-        redisScript = new DefaultRedisScript<>();
-        redisScript.setResultType(Long.class);
-        redisScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("test.lua")));
-    }
+    @Autowired
+    private LuaScriptSupport luaScriptSupport;
 
     /* Redis存储对象（对象序列化与反序列化） */
     @RequestMapping("/test")
@@ -76,7 +79,7 @@ public class IndexController {
         String key = "key1";
         String val = "value1";
         redisTemplate.opsForValue().set(key, val);
-        Long result = (Long) redisTemplate.execute(redisScript, Collections.singletonList(key), val);
+        Long result = luaScriptSupport.delete(key, val);
         log.info(String.valueOf(result));
         return new LinkedHashMap();
     }
@@ -90,8 +93,7 @@ public class IndexController {
             log.info("{} 加锁成功", key);
             /* 业务执行需要5秒，则5秒后才会释放 */
             TimeUnit.SECONDS.sleep(5);
-            String lockVal = (String) redisTemplate.opsForValue().get("key");
-            Long result = (Long) redisTemplate.execute(redisScript, Collections.singletonList(key), lockVal);
+            Long result = luaScriptSupport.delete(key, val);
             log.info("{} 解锁成功，结果为 {}", key, result);
         } else {
             log.info("{} 加锁失败", key);
@@ -100,12 +102,42 @@ public class IndexController {
 
     /* 搭配Lua脚本实现分布式锁 */
     @Async
-    @Scheduled(cron = "*/3 * * * * *")
+//    @Scheduled(cron = "*/3 * * * * *")
     public void test3() {
         LocalDateTime localDateTime = LocalDateTime.now();
         String time = localDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         log.info("{} 执行业务", time);
         lock("test"); /* 相同的key用同一把锁 */
+    }
+
+    /* 注解实现分布式限流 */
+    @RateLimit
+    @SneakyThrows
+    @RequestMapping("/test4")
+    public Map test4(@RequestParam(defaultValue = "1") Integer id) {
+        log.info("test4-{} 执行业务", id);
+        /* 注意，若业务时间超过RateLimit默认值，则加锁时间也会延长 */
+        TimeUnit.SECONDS.sleep(5);
+        return new LinkedHashMap();
+    }
+
+    @RequestMapping("/test5")
+    public Map test5() {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://127.0.0.1/test4?id=1"))
+                .build();
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+        Runnable runnable = () -> {
+            CompletableFuture<HttpResponse<String>> future = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            future.whenComplete((response, throwable) -> {
+                if (throwable != null) {
+                    throwable.printStackTrace();
+                }
+            }).join();
+        };
+        executor.scheduleAtFixedRate(runnable, 0, 2, TimeUnit.SECONDS);
+        return new LinkedHashMap();
     }
 
 }

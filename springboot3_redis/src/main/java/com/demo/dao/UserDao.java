@@ -1,5 +1,6 @@
-package com.demo;
+package com.demo.dao;
 
+import com.demo.model.User;
 import jakarta.annotation.Nonnull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
