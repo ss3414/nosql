@@ -22,7 +22,7 @@ public class ApplicationTest {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @Test
+//    @Test
     void test() {
         /* opsForValue/opsForHash通过相同的前缀取出来的是不同值 */
         Map<String, Object> map = new LinkedHashMap();
@@ -31,7 +31,7 @@ public class ApplicationTest {
         stringRedisTemplate.opsForHash().put("nosql:redis", "test", JSON.toJSONString(map));
     }
 
-    //    @Test
+    @Test
     void test2() {
         DefaultRedisScript<String> demoScript = new DefaultRedisScript<>();
         demoScript.setResultType(String.class);
@@ -40,7 +40,7 @@ public class ApplicationTest {
         String key = "1";
         String val = "2";
         String result = stringRedisTemplate.execute(demoScript, Collections.singletonList(key), val);
-        System.out.println(result);
+        System.out.println(JSON.parse(result));
     }
 
 }

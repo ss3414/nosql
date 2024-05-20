@@ -1,6 +1,6 @@
 package com.demo.controller;
 
-import com.demo.dao.UserDao;
+import com.demo.dao.UserComponent;
 import com.demo.model.User;
 import com.demo.ratelimit.RateLimit;
 import com.demo.redis.LuaScriptSupport;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 public class IndexController {
 
     @Autowired
-    private UserDao userDao;
+    private UserComponent userComponent;
 
     @RequestMapping("/")
     public Map index() {
@@ -42,19 +42,19 @@ public class IndexController {
 
     @RequestMapping("/find")
     public String find() {
-        User user = userDao.findById(1).orElseGet(() -> User.builder().build());
+        User user = userComponent.findById(1);
         return user.toString();
     }
 
     @RequestMapping("/save")
     public Map save() {
-        userDao.save(User.builder().id(1).name("name").build());
+        userComponent.save(User.builder().id(1).name("name").build());
         return new LinkedHashMap();
     }
 
     @RequestMapping("/delete")
     public Map delete() {
-        userDao.deleteById(2);
+        userComponent.deleteById(1);
         return new LinkedHashMap();
     }
 
