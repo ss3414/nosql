@@ -1,5 +1,7 @@
 package com.demo;
 
+import com.demo.mapper.ProductMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,9 @@ public class ElasticSearch {
     public ModelAndView index() {
         return new ModelAndView("/index");
     }
+
+    @Autowired
+    private ProductMapper productMapper;
 
     @RequestMapping("/test")
     public Map test() {
